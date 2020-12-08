@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function deleteProduct(p) {
+            let idProduct = p.getAttribute("href");
+            $.ajax({
+                type: "DELETE",
+                url: "/products/" + idProduct,
+                success: function () {
+                    successHandler();
+                }
+            })
+            event.preventDefault();
+        }
+
+        function successHandler() {
+            $.ajax({
+                type: "GET",
+                url: "/products",
+                success: function (data) {
+                    let content = '<tr>\n' +
+                        '<td>Name</td>\n' +
+                        '<td>Description</td>\n' +
+                        '<td>Image</td>\n' +
+                        '<td>Delete</td>\n' +
+                        '</tr>';
+                    for (let i = 0; i < data.length; i++) {
+                        content += getProduct(data[i]);
+                    }
+                    document.getElementById('productList').innerHTML = content;
+                }
+            });
+        }
+
+        function getProduct(product1) {
+            return `<tr><td>${product1.name}</td>\n` +
+                `<td>${product1.description}</td>\n` +
+                `<td>\n` +
+                `<img src="`+`../`+`${product1.image}" style="width: 400px; height: 200px">\n` +
+                `</td>\n` +
+                `<td><a onclick="deleteProduct(this)" href="${product1.id}">delete</a></td></tr>`;
+        }
+    </script>
+</head>
+<body>
+<h1>Tasks</h1>
+<table border="1px" id="productList">
+    <thead>
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            Description
+        </th>
+        <th>
+            Image
+        </th>
+        <th>
+            Delete
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="product: ${products}">
+        <td th:text="${product.getName()}"></td>
+        <td th:text="${product.getDescription()}"></td>
+        <td>
+            <img th:src="'../'+${product.image}" style="width: 400px; height: 200px">
+        </td>
+        <td><a onclick="deleteProduct(this)" th:href="${product.id}">delete</a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
